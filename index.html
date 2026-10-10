@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Tickets de Rifa</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Courier+Prime:wght@700&display=swap" rel="stylesheet">
+    <!-- Librería para convertir HTML a Imagen JPG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* Estilo para la imagen de fondo gr20.jpeg en el ticket */
+        #ticket-to-download {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.90)), url('gr20.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Inputs de control de flujo -->
+    <input type="radio" name="step" id="step-home" checked>
+    <input type="radio" name="step" id="step-config">
+    <input type="radio" name="step" id="step-ticket">
+
+    <div class="container">
+        
+        <!-- PANTALLA 1: INICIO -->
+        <div class="screen screen-home">
+            <div class="hero-card">
+                <div class="badge">Sistema Oficial de Rifas</div>
+                <h1>Generador de Comprobantes</h1>
+                <p>Crea tickets digitales profesionales con sorteo, lotería, fecha y número aleatorio de 4 dígitos para enviar a tus compradores.</p>
+                <label for="step-config" class="btn btn-primary">Crear Comprobante</label>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: CONFIGURACIÓN -->
+        <div class="screen screen-config">
+            <div class="card">
+                <h2>Datos de la Rifa</h2>
+                <p class="subtitle">Ingresa la información requerida para emitir el ticket.</p>
+                
+                <div class="form-group">
+                    <label for="client-name">Nombre del Comprador</label>
+                    <input type="text" id="client-name" placeholder="Ej. Carlos Rodríguez" value="Carlos Rodríguez">
+                </div>
+
+                <!-- Cédula y Teléfono -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="client-id">Cédula de Identidad</label>
+                        <input type="text" id="client-id" placeholder="Ej. V-12345678" value="V-12345678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="client-phone">Número Telefónico</label>
+                        <input type="text" id="client-phone" placeholder="Ej. 0412-1234567" value="0412-1234567">
+                    </div>
+                </div>
+
+                <!-- Dirección -->
+                <div class="form-group">
+                    <label for="client-address">Dirección</label>
+                    <input type="text" id="client-address" placeholder="Ej. Av. Principal, Sector Centro" value="Av. Principal, Maturin">
+                </div>
+
+                <div class="form-group">
+                    <label for="raffle-name">Nombre del Sorteo / Premio</label>
+                    <input type="text" id="raffle-name" placeholder="Ej. Gran Rifa de Lujo" value="Gran Rifa de Lujo: Bera GR250 + iPhone 17 Pro Max">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lottery-name">Lotería que Juega</label>
+                        <select id="lottery-name">
+                            <option value="Súper Gana">Súper Gana</option>
+                            <option value="Lotería del Zulia">Lotería del Zulia</option>
+                            <option value="Lotería del Táchira">Lotería del Táchira</option>
+                            <option value="Lotería de Caracas">Lotería de Caracas</option>
+                            <option value="Triple Táchira">Triple Táchira</option>
+                            <option value="Otro Sorteo Oficial">Otro Sorteo Oficial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="raffle-date">Fecha del Sorteo</label>
+                        <input type="date" id="raffle-date" value="2026-12-31">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <label for="step-home" class="btn btn-secondary">Cancelar</label>
+                    <label for="step-ticket" id="btn-generate" class="btn btn-primary">Generar Ticket y Número</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: TICKET FINAL Y DESCARGA -->
+        <div class="screen screen-ticket">
+            <div class="ticket-wrapper">
+                
+                <!-- TICKET QUE SE DESCARGARÁ COMO JPG -->
+                <div class="ticket" id="ticket-to-download">
+                    <div class="ticket-header">
+                        <span class="ticket-tag">COMPROBANTE DE TICKET OFICIAL</span>
+                        <h3 id="display-raffle">Gran Rifa de Lujo</h3>
+                    </div>
+                    
+                    <div class="ticket-body">
+                        <div class="info-row">
+                            <span class="label">Comprador:</span>
+                            <span class="value" id="display-client">Carlos Rodríguez</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Cédula:</span>
+                            <span class="value" id="display-id">V-12345678</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Teléfono:</span>
+                            <span class="value" id="display-phone">0412-1234567</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Dirección:</span>
+                            <span class="value" id="display-address">Av. Principal, Maturin</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Lotería:</span>
+                            <span class="valueHighlight" id="display-lottery">Súper Gana</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Fecha del Sorteo:</span>
+                            <span class="value" id="display-date">31/12/2026</span>
+                        </div>
+                        
+                        <div class="number-box">
+                            <span class="number-label">NÚMERO ASIGNADO DE 4 DÍGITOS</span>
+                            <div class="random-number" id="display-number">0000</div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-footer">
+                        <div class="barcode"></div>
+                        <span class="ticket-id" id="display-ref">REF: #RF-0000</span>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="ticket-actions">
+                    <button id="btn-download-jpg" class="btn btn-success">📸 Descargar Comprobante JPG</button>
+                    <label for="step-config" class="btn btn-secondary">← Editar Datos</label>
+                    <label for="step-home" class="btn btn-outline">Inicio</label>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT PARA GENERAR NÚMERO Y DESCARGAR IMAGEN JPG -->
+    <script>
+        // Actualizar ticket con los datos del formulario y generar número aleatorio (0000 - 9999)
+        document.getElementById('btn-generate').addEventListener('click', function() {
+            // Generar número aleatorio de 4 dígitos con ceros a la izquierda
+            const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            
+            // Obtener fecha en formato legible (DD/MM/AAAA)
+            const rawDate = document.getElementById('raffle-date').value;
+            let formattedDate = rawDate;
+            if (rawDate) {
+                const parts = rawDate.split('-');
+                if (parts.length === 3) {
+                    formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+
+            // Actualizar campos dentro del Ticket
+            document.getElementById('display-raffle').textContent = document.getElementById('raffle-name').value || 'Gran Rifa de Lujo';
+            document.getElementById('display-client').textContent = document.getElementById('client-name').value || 'Cliente';
+            document.getElementById('display-id').textContent = document.getElementById('client-id').value || 'V-00000000';
+            document.getElementById('display-phone').textContent = document.getElementById('client-phone').value || '0000-0000000';
+            document.getElementById('display-address').textContent = document.getElementById('client-address').value || 'Sin dirección';
+            document.getElementById('display-lottery').textContent = document.getElementById('lottery-name').value;
+            document.getElementById('display-date').textContent = formattedDate;
+            document.getElementById('display-number').textContent = randomNum;
+            document.getElementById('display-ref').textContent = `REF: #RF-${randomNum}`;
+        });
+
+        // Descargar el ticket en formato de imagen JPG
+        document.getElementById('btn-download-jpg').addEventListener('click', function() {
+            const ticketElement = document.getElementById('ticket-to-download');
+
+            html2canvas(ticketElement, {
+                scale: 2, // Mejor calidad/resolución
+                backgroundColor: "#ffffff",
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Ticket-Rifa-${document.getElementById('display-number').textContent}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>
